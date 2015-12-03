@@ -16,7 +16,15 @@ package com.het.librebind.callback;
  * Description:
  */
 public interface OnTcpListener {
-	void messageReceived(byte[] recv);
+    //拒绝连接,基本是socketserver没启动
+    int ECONN_REFUSED = 0x0100;
+    //发送的时候服务器关闭
+    int CHANNEL_CLOSED = 0x0200;
+    //接收数据异常
+    int READ_EXCEPTION = 0x0300;
+    //写出数据异常
+    int WRITE_EXCEPTION = 0x0400;
 
+    void messageReceived(byte[] recv);
     void exceptionCaught(int id, String error);
 }

@@ -8,6 +8,103 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/ip"
+            android:text="192.168.100.5"
+            android:layout_weight="5"
+            android:hint="please input any Ip addr"
+            android:layout_width="0.0dp"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:text="connect"
+            android:onClick="onConnect"
+            android:layout_weight="3"
+            android:layout_width="0.0dp"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:text="send"
+            android:onClick="onSend"
+            android:layout_weight="2"
+            android:layout_width="0.0dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/pre"
+            android:onClick="onControl"
+            android:layout_weight="1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="上" />
+
+        <Button
+            android:id="@+id/next"
+            android:onClick="onControl"
+            android:layout_weight="1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="下" />
+
+        <Button
+            android:id="@+id/add"
+            android:onClick="onControl"
+            android:layout_weight="1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="+" />
+
+        <Button
+            android:id="@+id/del"
+            android:onClick="onControl"
+            android:layout_weight="1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="-" />
+
+        <Button
+            android:id="@+id/paly"
+            android:onClick="onControl"
+            android:layout_weight="1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="play" />
+
+        <Button
+            android:id="@+id/pause"
+            android:onClick="onControl"
+            android:layout_weight="0.9"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="pause" />
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/request"
+            android:onClick="onControl"
+            android:layout_weight="1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="request" />
+
+        <Button
+            android:id="@+id/playlist"
+            android:onClick="onControl"
+            android:layout_weight="1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="playlist" />
         <Button
             android:onClick="onScan"
             android:layout_weight="1"

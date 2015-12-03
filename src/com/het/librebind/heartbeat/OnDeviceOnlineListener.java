@@ -28,11 +28,11 @@ public abstract class OnDeviceOnlineListener {
     protected boolean runnable = true;
     private Thread backgroudThread;
     /**
-     * ÐÄÌø³¬Ê±Ê±¼ä
+     * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±Ê±ï¿½ï¿½
      */
     private final static long keepaliveTimeout = 3 * 1000;
 
-    private PacketBuffer createHeartBeatData(){
+    public PacketBuffer createHeartBeatData() {
         BasicModel heart = new BasicModel();
         heart.setCmd(CMD.HET_APP_HEARTBEAT);
         heart.setCode("0");
@@ -50,7 +50,7 @@ public abstract class OnDeviceOnlineListener {
 
     private void createSocket(){
         if (device != null) {
-            if (tcpSocket == null || !tcpSocket.isSocketConnected()) {
+            if (tcpSocket == null) {
                 tcpSocket = new TcpSocket(new OnTcpListener() {
                     @Override
                     public void messageReceived(byte[] recv) {
@@ -59,12 +59,20 @@ public abstract class OnDeviceOnlineListener {
 
                     @Override
                     public void exceptionCaught(int id, String error) {
-                        System.out.println(Thread.currentThread().getName()+"#####################"+error);
-                        onExceptionCaught(id, error);
+                        System.out.println(Thread.currentThread().getName() + "#####################" + error + " " + id);
+//                        onExceptionCaught(id, error);
                     }
                 });
             }
             tcpSocket.open(device.getDeviceIp(), port);
+        }
+    }
+
+    private void reConnect() {
+        if (tcpSocket == null) {
+            createSocket();
+        } else {
+            tcpSocket.open();
         }
     }
 
@@ -81,12 +89,12 @@ public abstract class OnDeviceOnlineListener {
                 return;
             if (ison == null)
                 return;
+            onRecevie(basicModel.getCmd(), ison);
             switch (basicModel.getCmd()) {
-                //Éè±¸ÐÄÌø°ü
+                //ï¿½è±¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                 case CMD.HET_DEVICE_HEARTBEAT:
                     break;
                 default:
-                    onRecevie(ison);
                     break;
             }
         } catch (UnsupportedEncodingException e) {
@@ -107,27 +115,34 @@ public abstract class OnDeviceOnlineListener {
 
     public void keepHeartBeatAlive(){
         if (device != null) {
+            if (tcpSocket == null) {
+                createSocket();
+            }
             if (dataQueue.size() <= 0) {
                 if (tcpSocket != null) {
                     try {
                         TcpPacket tcpPacket = new TcpPacket();
                         tcpPacket.pack(curcentHeartBeatPacket.getData());
-                        System.out.println("000000000000000000000" + tcpSocket.isSocketConnected());
                         tcpSocket.send(tcpPacket);
                         curcentHeartBeatPacket = createHeartBeatData();
                     } catch (ClosedChannelException e) {
                         e.printStackTrace();
-                        onDisconnect(tcpSocket, device);
-                        if (!tcpSocket.isSocketConnected()){
-                            createSocket();
-                        }
+                        onDisconnect(tcpSocket, device, e.getMessage());
+                        reConnect();
                     }
                 }
             }
             long interval = System.currentTimeMillis() - curcentHeartBeatPacket.getTimestamp();
             if (interval > keepaliveTimeout) {
-                //ÐÄÌø°ü³¬Ê±£¬ÓëÉè±¸Á¬½ÓÒÑ¶Ï¿ª£¬ÇëÖØÐÂÁ¬½ÓÉè±¸
-                onDisconnect(tcpSocket, device);
+                //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½è±¸ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¶Ï¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½è±¸
+                TcpPacket tcpPacket = new TcpPacket();
+                tcpPacket.pack(curcentHeartBeatPacket.getData());
+                try {
+                    tcpSocket.send(tcpPacket);
+                } catch (ClosedChannelException e) {
+                    e.printStackTrace();
+                    onDisconnect(tcpSocket, device, e.getMessage());
+                }
             }
         }
     }
@@ -156,7 +171,7 @@ public abstract class OnDeviceOnlineListener {
             public void run() {
                 while (runnable) {
                     try {
-                        //Èô¶ÓÁÐÎª¿Õ£¬ÔòÏß³Ì×èÈûÔÚ´Ë´¦
+                        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½Õ£ï¿½ï¿½ï¿½ï¿½ß³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´Ë´ï¿½
                         PacketBuffer data = dataQueue.take();
                         write(data);
                     } catch (InterruptedException e) {
@@ -171,7 +186,7 @@ public abstract class OnDeviceOnlineListener {
     private void write(PacketBuffer data){
         TcpPacket tcpPacket = new TcpPacket();
         tcpPacket.pack(data.getData());
-        if (tcpSocket == null){
+        if (tcpPacket == null) {
             createSocket();
         }
         if (tcpSocket != null) {
@@ -179,6 +194,7 @@ public abstract class OnDeviceOnlineListener {
                 tcpSocket.send(tcpPacket);
             } catch (ClosedChannelException e) {
                 e.printStackTrace();
+                onDisconnect(tcpSocket, device, e.getMessage());
             }
         }
     }
@@ -186,12 +202,12 @@ public abstract class OnDeviceOnlineListener {
 
     public void release(){
         runnable = false;
-        tcpSocket.close();
+        if (tcpSocket != null)
+            tcpSocket.close();
     }
 
-    public abstract void onExceptionCaught(int id, String error);
 
-    public abstract void onDisconnect(Object instance, DeviceModel device);
+    public abstract void onDisconnect(Object instance, DeviceModel device, String error);
 
-    public abstract void onRecevie(Object value);
+    public abstract void onRecevie(int cmd, Object value);
 }

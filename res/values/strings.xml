@@ -2,4 +2,62 @@
 <resources>
     <string name="app_name">MyActivity</string>
     <string name="title_no_sac_device">No SAC devices found</string>
+    <string name="songlist">{
+    "command": 1,
+    "code": 0,
+    "type": "current",
+    "data": [
+        {
+            "id": 0,
+            "name": "000",
+            "artist": "000",
+            "lrc_id": "0000",
+            "album_title": "00000",
+            "image_url_small": "00000",
+            "image_url_middle": "00000",
+            "image_url_large": "0000000",
+            "mac": "xxxxxxxxxxxx",
+            "column_index": "x00000000",
+            "album_id": "000000",
+            "url": {
+                "utype": 5,
+                "uri": "http://fdfs.xmcdn.com/group13/M02/4D/E3/wKgDXVWx0tDx5bfLAAmf1-xDN9M462.mp3"
+            }
+        },
+        {
+            "id": 1,
+            "name": "11111",
+            "artist": "11111",
+            "album_title": "11111",
+            "lrc_id": "111",
+            "image_url_small": "1111111",
+            "image_url_middle": "1111111",
+            "image_url_large": "11111111",
+            "mac": "111111111",
+            "column_index": "111111111",
+            "album_id": "1111111",
+            "url": {
+                "utype": 5,
+                "uri": "http://fdfs.xmcdn.com/group5/M02/12/A2/wKgDtlN41fHhMKUdAA3yyW_Y1KM549.mp3"
+            }
+        },
+        {
+            "id": 2,
+            "name": "222222",
+            "artist": "22222222",
+            "album_title": "2222222222222",
+            "lrc_id": "2222",
+            "image_url_small": "22222",
+            "image_url_middle": "22222",
+            "image_url_large": "2222222",
+            "mac": "2222",
+            "column_index": "22222222",
+            "album_id": "2222",
+            "url": {
+                "utype": 5,
+                "uri": "http://fdfs.xmcdn.com/group4/M06/B6/C8/wKgDs1PrbDeSZit2ABHrEgnGwg8618.mp3"
+            }
+        }
+    ]
+}</string>
 </resources>

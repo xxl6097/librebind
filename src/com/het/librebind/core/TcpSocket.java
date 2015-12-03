@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------
- * Copyright ?2014 clife - ºÍ¶øÌ©¼Ò¾ÓÔÚÏßÍøÂç¿Æ¼¼ÓĞÏŞ¹«Ë¾
+ * Copyright ?2014 clife - å’Œè€Œæ³°å®¶å±…åœ¨çº¿ç½‘ç»œç§‘æŠ€æœ‰é™å…¬å¸
  * Shenzhen H&T Intelligent Control Co.,Ltd.
  * -----------------------------------------------------------------
  *
@@ -29,15 +29,15 @@ import java.util.Iterator;
  * Created by Android Studio.
  * Author: UUXIA
  * Date: 2015-11-12 11:23
- * Description: tcp¹ÜÀíÀà
+ * Description: tcpç®¡ç†ç±»
  */
 public class TcpSocket {
-    private final int STATE_OPEN = 1;// socket´ò¿ª
-    private final int STATE_CLOSE = 1 << 1;// socket¹Ø±Õ
-    private final int STATE_CONNECT_START = 1 << 2;// ¿ªÊ¼Á¬½Óserver
-    private final int STATE_CONNECT_SUCCESS = 1 << 3;// Á¬½Ó³É¹¦
-    private final int STATE_CONNECT_FAILED = 1 << 4;// Á¬½ÓÊ§°Ü
-    private final int STATE_CONNECT_WAIT = 1 << 5;// µÈ´ıÁ¬½Ó
+    private final int STATE_OPEN = 1;// socketæ‰“å¼€
+    private final int STATE_CLOSE = 1 << 1;// socketå…³é—­
+    private final int STATE_CONNECT_START = 1 << 2;// å¼€å§‹è¿æ¥server
+    private final int STATE_CONNECT_SUCCESS = 1 << 3;// è¿æ¥æˆåŠŸ
+    private final int STATE_CONNECT_FAILED = 1 << 4;// è¿æ¥å¤±è´¥
+    private final int STATE_CONNECT_WAIT = 1 << 5;// ç­‰å¾…è¿æ¥
 
     private String IP = "203.195.139.126";
     private int PORT = 8090;
@@ -159,7 +159,7 @@ public class TcpSocket {
                 socketChannel.register(selector, SelectionKey.OP_CONNECT);
 
                 while (state != STATE_CLOSE) {
-                    // ´ÓÑ¡ÔñÆ÷ÒÑ¾­¾ÍĞ÷Í¨µÀÊıÁ¿£¬Ò»°ãÇé¿ö·µ»Ø1
+                    // ä»é€‰æ‹©å™¨å·²ç»å°±ç»ªé€šé“æ•°é‡ï¼Œä¸€èˆ¬æƒ…å†µè¿”å›1
                     int readyChannels = selector.select();
                     if (readyChannels == 0) {
                         continue;
@@ -200,7 +200,7 @@ public class TcpSocket {
             } catch (Exception e) {
                 e.printStackTrace();
                 if (respListener != null){
-                    respListener.exceptionCaught(0,e.getMessage());
+                    respListener.exceptionCaught(0, e.toString());
                 }
             } finally {
                 if (null != socketChannel) {
@@ -220,14 +220,18 @@ public class TcpSocket {
             // System.out.println("Conn :End");
         }
 
-        private boolean finishConnection(SelectionKey key) throws IOException {
+        private boolean finishConnection(SelectionKey key) {
             boolean result = false;
             SocketChannel socketChannel = (SocketChannel) key.channel();
-            // ÅĞ¶Ï´ËÍ¨µÀÉÏÊÇ·ñÕıÔÚ½øĞĞÁ¬½Ó²Ù×÷¡£
-            // Íê³ÉÌ×½Ó×ÖÍ¨µÀµÄÁ¬½Ó¹ı³Ì¡£
+            // åˆ¤æ–­æ­¤é€šé“ä¸Šæ˜¯å¦æ­£åœ¨è¿›è¡Œè¿æ¥æ“ä½œã€‚
+            // å®Œæˆå¥—æ¥å­—é€šé“çš„è¿æ¥è¿‡ç¨‹ã€‚
             if (socketChannel.isConnectionPending()) {
-                // Íê³ÉÁ¬½ÓµÄ½¨Á¢£¨TCPÈı´ÎÎÕÊÖ£©
-                result = socketChannel.finishConnect();// Ã»ÓĞÍøÂçµÄÊ±ºòÒ²·µ»Øtrue
+                // å®Œæˆè¿æ¥çš„å»ºç«‹ï¼ˆTCPä¸‰æ¬¡æ¡æ‰‹ï¼‰
+                try {
+                    result = socketChannel.finishConnect();// æ²¡æœ‰ç½‘ç»œçš„æ—¶å€™ä¹Ÿè¿”å›true
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 if (result) {
                     key.interestOps(SelectionKey.OP_READ);
                     state = STATE_CONNECT_SUCCESS;
@@ -237,27 +241,38 @@ public class TcpSocket {
             return result;
         }
 
-        private void read(SelectionKey key) throws IOException {
+        private void read(SelectionKey key) {
             SocketChannel socketChannel = (SocketChannel) key.channel();
             readBuffer.clear();
             int numRead;
-            numRead = socketChannel.read(readBuffer);
-            if (numRead == -1) {
-                key.channel().close();
-                key.cancel();
-                return;
-            }
-            // respListener.onSocketResponse(new String(readBuffer.array(),
-            // 0,numRead));
+            try {
+                numRead = socketChannel.read(readBuffer);
+                if (numRead == -1) {
+                    key.channel().close();
+                    key.cancel();
+                    return;
+                }
+                // respListener.onSocketResponse(new String(readBuffer.array(),
+                // 0,numRead));
 
-            byte[] stores = new byte[numRead];
-            System.arraycopy(readBuffer.array(), 0, stores, 0, numRead);
-            respListener.messageReceived(stores);
+                byte[] stores = new byte[numRead];
+                System.arraycopy(readBuffer.array(), 0, stores, 0, numRead);
+                if (respListener != null) {
+                    respListener.messageReceived(stores);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                if (respListener != null) {
+                    respListener.exceptionCaught(OnTcpListener.READ_EXCEPTION, e.getMessage());
+                }
+            }
+
+
 
 //			key.interestOps(SelectionKey.OP_WRITE);
         }
 
-        private void write(SelectionKey key) throws IOException {
+        private void write(SelectionKey key) {
             SocketChannel socketChannel = (SocketChannel) key.channel();
             synchronized (lock) {
                 TcpPacket item;
@@ -265,7 +280,14 @@ public class TcpSocket {
                 while (iter.hasNext()) {
                     item = iter.next();
                     ByteBuffer buf = ByteBuffer.wrap(item.getPacket());
-                    socketChannel.write(buf);
+                    try {
+                        socketChannel.write(buf);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        if (respListener != null) {
+                            respListener.exceptionCaught(OnTcpListener.WRITE_EXCEPTION, e.getMessage());
+                        }
+                    }
                     iter.remove();
                 }
                 item = null;

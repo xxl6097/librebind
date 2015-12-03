@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------
- * Copyright ?2014 clife - ºÍ¶øÌ©¼Ò¾ÓÔÚÏßÍøÂç¿Æ¼¼ÓÐÏÞ¹«Ë¾
+ * Copyright ?2014 clife - ï¿½Í¶ï¿½Ì©ï¿½Ò¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¼ï¿½ï¿½ï¿½ï¿½Þ¹ï¿½Ë¾
  * Shenzhen H&T Intelligent Control Co.,Ltd.
  * -----------------------------------------------------------------
  *
@@ -66,11 +66,11 @@ public class JavaMain implements IRecevie {
                 udpClient.setLocalIp(localip);
             }
             udpClient.setBroadCasetIp(mBraodIp);
-            Logc.i("³É¹¦´´½¨UDP Channel..¹ã²¥µØÖ·:" + mBraodIp + ":" + port + " ±¾»úIP:" + localip);
+            Logc.i("ï¿½É¹ï¿½ï¿½ï¿½ï¿½ï¿½UDP Channel..ï¿½ã²¥ï¿½ï¿½Ö·:" + mBraodIp + ":" + port + " ï¿½ï¿½ï¿½ï¿½IP:" + localip);
 
         } catch (IOException e) {
             e.printStackTrace();
-            Logc.e("UDP Channel ´´½¨Ê§°Ü.." + e.getMessage(), true);
+            Logc.e("UDP Channel ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½.." + e.getMessage(), true);
         }
 
         return udpClient;

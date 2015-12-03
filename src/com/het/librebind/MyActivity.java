@@ -63,6 +63,8 @@ public class MyActivity extends Activity {
     public ProgressDialog mProgressDialog;
     private boolean isLibreConnected = true;
 
+    private EditText et_ip;
+
     private HashMap<String,DeviceModel> discoverDeviceSet = new HashMap<>();
 
     private List<DeviceModel> mData = new ArrayList<>();
@@ -73,20 +75,20 @@ public class MyActivity extends Activity {
     final int CONNECT_ORIGINAL_SSID = 0x00aa;
 
     private OnDeviceOnlineListener deviceOnlineListener = new OnDeviceOnlineListener() {
-        @Override
-        public void onExceptionCaught(int id, String error) {
-            System.out.println(id+"---------exceptionCaught-------"+error);
-        }
+//        @Override
+//        public void onExceptionCaught(int id, String error) {
+//            System.out.println(id+"---------exceptionCaught-------"+error);
+//        }
 
         @Override
-        public void onDisconnect(Object instance, DeviceModel device) {
+        public void onDisconnect(Object instance, DeviceModel device, String error) {
             TcpSocket tcp = (TcpSocket) instance;
-            System.out.println(tcp.isSocketConnected()+"--------onDisconnect--------"+device);
+            System.out.println(tcp.isSocketConnected() + "--------onDisconnect--------" + device + " " + error);
         }
 
         @Override
-        public void onRecevie(Object value) {
-            System.out.println("--------onRecevie--------"+value.toString());
+        public void onRecevie(int cmd, Object value) {
+            System.out.println(cmd + "--------onRecevie--------" + value.toString());
         }
     };
 
@@ -126,6 +128,7 @@ public class MyActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(receiverWifi);
         KeepAliveManager.getInstnce().unresgisterDeviceOnlineListener(deviceOnlineListener);
     }
 
@@ -168,7 +171,64 @@ public class MyActivity extends Activity {
 
     }
 
+    public void onControl(View view) {
+        BasicModel data = new BasicModel();
+        switch (view.getId()) {
+            case R.id.pre:
+                data.setCmd(CMD.HET_PRE);
+                data.setData("8");
+                break;
+            case R.id.next:
+                data.setCmd(CMD.HET_NEXT);
+                data.setData("7");
+                break;
+            case R.id.add:
+                data.setCmd(CMD.HET_PALY);
+                data.setData("1");
+                break;
+            case R.id.del:
+                data.setCmd(CMD.HET_VOLUME_DEL);
+                data.setData("5");
+                break;
+            case R.id.paly:
+                data.setCmd(CMD.HET_VOLUME_ADD);
+                data.setData("4");
+                break;
+            case R.id.pause:
+                data.setCmd(CMD.HET_PAUSE);
+                data.setData("9");
+                break;
+            case R.id.request:
+                data.setCmd(CMD.HET_CHECK_SONG);
+                break;
+            case R.id.playlist:
+                String ison = getResources().getString(R.string.songlist);
+                PacketBuffer packet = new PacketBuffer();
+                packet.setData(ison.getBytes());
+                deviceOnlineListener.send(packet);
+                return;
+            default:
+                break;
+        }
+        data.setCode("0");
+        String sendData = GsonUtils.pack(data);
+        PacketBuffer packet = new PacketBuffer();
+        packet.setData(sendData.getBytes());
+        deviceOnlineListener.send(packet);
+    }
+
+    public void onSend(View view) {
+        deviceOnlineListener.send(deviceOnlineListener.createHeartBeatData());
+    }
+
+    public void onConnect(View view) {
+        DeviceModel dm = new DeviceModel();
+        dm.setDeviceIp(et_ip.getText().toString());
+        tips(dm.toString());
+        deviceOnlineListener.setDevice(dm);
+    }
     private void initView(){
+        et_ip = (EditText) findViewById(R.id.ip);
         text = (TextView) findViewById(R.id.text);
         apListView = (ListView) findViewById(R.id.aplist);
         adpter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, wifiConnect.mSACDevicesList);
